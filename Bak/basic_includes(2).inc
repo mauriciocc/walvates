@@ -1,0 +1,59 @@
+include \masm32\include\masm32rt.inc
+
+; Protótipo de funcoes
+ProcEvento PROTO :HWND,:UINT,:WPARAM,:LPARAM
+
+; Identificadores de elementos de janela
+.const
+ID_DLG1 equ 1000
+ID_BTN_ENVIA equ 1001
+ID_TEXT equ 1002
+
+ID_BTN_RECEBE equ 1004
+ID_TEXT_RECEBE equ 1003
+
+.data	
+	Inst_principal dd ?
+	vetor db 0,0,0,0
+
+.code
+
+MSG_BOX MACRO text, title
+	invoke MessageBox, NULL, text, title, MB_OK		 
+ENDM
+
+
+
+decode_wparam PROTO :WPARAM
+decode_wparam proc wParam:WPARAM
+	;wParam informa tipo (parte alta) e ID (parte baixa)
+	mov eax,wParam ; tipo_numero -> tipo do evento + id do elemento
+	mov edx,eax
+	shr edx,16 ; -> desloca 16 bits para a direita, mantendo so o tipo
+	and eax,0FFFFh ; -> elimina os 16 bits superiores, mantento so o numero
+	ret
+decode_wparam endp
+
+mem_alloc proto :UINT
+
+mem_alloc proc numberOfBytes:UINT
+	invoke GetProcessHeap
+	invoke HeapAlloc, eax, HEAP_ZERO_MEMORY, numberOfBytes
+	ret
+mem_alloc endp
+
+mem_free proto :UINT
+
+mem_free proc dataPtr:UINT
+	invoke GetProcessHeap
+	invoke HeapFree, eax, 0, dataPtr
+	ret
+mem_free endp
+
+mem_size proto :UINT
+
+mem_size proc dataPtr:UINT
+	invoke GetProcessHeap
+	invoke HeapSize, eax, 0, dataPtr
+	ret
+mem_size endp
