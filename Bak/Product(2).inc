@@ -32,7 +32,7 @@ parseProductList proc listString:UINT
 			
 			push ecx
 			
-			mov ebx, 0
+			mov edx, 0
 			mov ecx, 0
 			mov al, [esi]
 			.repeat
@@ -40,18 +40,18 @@ parseProductList proc listString:UINT
 				.if al == 9
 						
 						;novo campo
-						inc ebx
+						inc edx
 						mov ecx, 0
 					
 					.else
 
-						.if ebx == 0
+						.if edx == 0
 							mov [edi].Product.barcode[ecx], al
-						.elseif ebx == 1							
+						.elseif edx == 1							
 							mov [edi].Product.product_name[ecx], al
-						.elseif ebx == 2
+						.elseif edx == 2
 							mov [edi].Product.company[ecx], al							
-						.elseif ebx == 3
+						.elseif edx == 3
 							mov [edi].Product.price[ecx], al
 						.endif
 						
@@ -136,14 +136,9 @@ findProductByBarcode proc codeToSearch:dword, productList:dword
 		sub ecx, eax
 		mov eax, type Product
 		mul ecx
-		add eax, productList
-		ret
+		add eax, productList		
 	.endif
 	
-	mov eax, ecx
-	pop ecx
-	sub ecx, eax
-	
-	
+	ret
 		
 findProductByBarcode endp

@@ -114,7 +114,7 @@ findProductByBarcode proc codeToSearch:dword, productList:dword
 				
 		push esi
 		push ecx			
-			mov ecx, 13
+			mov ecx, 14
 			cld
 			repe cmpsb
 			mov eax, ecx

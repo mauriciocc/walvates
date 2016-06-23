@@ -126,20 +126,24 @@ findProductByBarcode proc codeToSearch:dword, productList:dword
 		add esi, type Product		
 		dec ecx
 	.endw
-	mov eax, ecx
-	pop ecx
-	sub ecx, eax
 	
-	mov eax, ustr$(ecx)
-	MSG_BOX eax, eax
 	.if ecx == 0
 		mov eax, -1
-		ret
+		pop ecx	
 	.else
+		mov eax, ecx
+		pop ecx
+		sub ecx, eax
 		mov eax, type Product
 		mul ecx
 		add eax, productList
 		ret
 	.endif
+	
+	mov eax, ecx
+	pop ecx
+	sub ecx, eax
+	
+	
 		
 findProductByBarcode endp

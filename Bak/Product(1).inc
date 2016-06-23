@@ -9,7 +9,7 @@ PProduct TYPEDEF PTR Product
 .code
 
 parseProductList proto :UINT
-parseProductList proc listString:UINT	
+parseProductList proc uses esi edi listString:UINT	
 	local strSize :UINT
 	local result :UINT
 	
