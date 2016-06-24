@@ -1,14 +1,23 @@
 .const
-	FTotalValue  equ 1008
-	FEanInput 	 equ 1003
-	AddItemBtn	 equ 1001
-	FProductList equ 1002
-	CloseSaleBtn equ 1005
+	FTotalValue  	equ 1008
+	FEanInput 	 	equ 1003
+	AddItemBtn	 	equ 1001
+	FProductList 	equ 1002
+	CloseSaleBtn 	equ 1005
+	ReadBalanceBtn  equ 1004
 	
+	STRING_BUFFER	equ 1024*8
+	EAN_BUFFER		equ	16
+			
 	productsFile db  "lista_barra.txt",0
 	
 	msg_attention db "Atenção!",0
 	msg_product_not_found_message db "Item não encontrado",0
+	msg_weight db "Peso: ",0
+	msg_price_kg db "Preço/Kg: ",0
+	msg_kg db " Kg",0
+	msg_total_value db "Valor Total: ", 0
+	msg_rs db "R$ ", 0
 
 .data
 	
@@ -22,22 +31,22 @@ UpdateTotalValue macro hWin
 	invoke SetDlgItemText, hWin, FTotalValue, eax	
 endm
 
-ReadEanInput proc hWin:HWND
-	invoke mem_alloc, 16
+ReadDialogField proc hWin:HWND, element:dword, bufferSize:dword
+	invoke mem_alloc, bufferSize
 	push eax	
-	invoke GetDlgItemText, hWin, FEanInput, eax, 16
+	invoke GetDlgItemText, hWin, element, eax, bufferSize
 	pop eax
 	ret 
-ReadEanInput endp
+ReadDialogField endp
 
 UpdateProductList proc hWin:HWND, productPtr:dword
 	local buffer :dword
-	invoke mem_alloc, 1024*8
-	mov buffer, eax	
-		invoke GetDlgItemText, hWin, FProductList, buffer, 1024*8 
-		mov buffer, cat$(buffer, addr [esi].Product.barcode, chr$(9), addr [esi].Product.product_name, chr$(9), addr [esi].Product.company, chr$(9), addr [esi].Product.price, chr$(13,10))
+	invoke ReadDialogField,hWin, FProductList, STRING_BUFFER	
+	mov buffer, eax 
+		mov buffer, cat$(buffer, addr [esi].Product.barcode, chr$(9), addr [esi].Product.product_name, chr$(9), addr [esi].Product.company, chr$(9), addr msg_rs ,addr [esi].Product.price, chr$(13,10))
 		invoke SetDlgItemText, hWin, FProductList, buffer
 	invoke mem_free, buffer
+	invoke SetDlgItemText, hWin, FEanInput, NULL
 	ret	
 UpdateProductList endp
 
@@ -55,3 +64,51 @@ AddItemBtnClicked proc uses esi ean:dword, hWin:HWND
 	.endif
 	ret	
 AddItemBtnClicked endp
+
+CloseSaleBtnClicked proc hWin:HWND
+	local emptyString :dword
+	mov emptyString, chr$(0)
+	invoke SetDlgItemText, hWin, FEanInput, emptyString
+	invoke SetDlgItemText, hWin, FTotalValue, emptyString
+	invoke SetDlgItemText, hWin, FProductList, emptyString
+	fldz
+	fstp totalValue	
+	ret
+CloseSaleBtnClicked endp
+
+ReadBalanceBtnClicked proc uses esi hWin:HWND
+	local buffer :dword
+	local realVal :real8
+	
+	invoke ReadDialogField,hWin, FProductList, STRING_BUFFER	
+	mov buffer, eax 
+		
+	invoke readUranoValue, hWin	
+	mov esi, eax
+	
+	invoke toDouble, addr [esi].BalanceCapture.peso
+	fstp realVal
+	mov eax, real8$(realVal)
+	mov buffer, cat$(buffer, addr msg_weight, eax, addr msg_kg, chr$(9,9))
+	
+	invoke toDouble, addr [esi].BalanceCapture.precoKg
+	fstp realVal
+	mov eax, real8$(realVal)
+	mov buffer, cat$(buffer, addr msg_price_kg, eax, chr$(9))
+	
+	invoke toDouble, addr [esi].BalanceCapture.vlrTotal
+	fstp realVal
+	mov eax, real8$(realVal)
+	mov buffer, cat$(buffer, addr msg_total_value, addr msg_rs, eax, chr$(13,10))
+	
+	invoke SetDlgItemText, hWin, FProductList, buffer	
+	
+	invoke toDouble, addr [esi].BalanceCapture.vlrTotal
+	SUM_FP totalValue
+	UpdateTotalValue hWin
+	
+	invoke mem_free, esi
+	invoke mem_free, buffer
+	
+	ret
+ReadBalanceBtnClicked endp

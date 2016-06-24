@@ -19,7 +19,9 @@ ID_TEXT_RECEBE equ 1003
 .code
 
 MSG_BOX MACRO text, title
-	invoke MessageBox, NULL, text, title, MB_OK		 
+	pusha
+	invoke MessageBox, NULL, text, title, MB_OK
+	popa		 
 ENDM
 
 
@@ -57,3 +59,12 @@ mem_size proc dataPtr:UINT
 	invoke HeapSize, eax, 0, dataPtr
 	ret
 mem_size endp
+
+mem_array_length proto :dword, :dword
+
+mem_array_length proc dataPtr:dword, itemSize:dword	
+	invoke mem_size, dataPtr	 
+	mov edx, 0
+	div itemSize	
+	ret
+mem_array_length endp

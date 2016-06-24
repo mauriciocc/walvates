@@ -18,6 +18,14 @@ ID_TEXT_RECEBE equ 1003
 
 .code
 
+MSG_BOX MACRO text, title
+	pusha
+	invoke MessageBox, NULL, text, title, MB_OK
+	popa		 
+ENDM
+
+
+
 decode_wparam PROTO :WPARAM
 decode_wparam proc wParam:WPARAM
 	;wParam informa tipo (parte alta) e ID (parte baixa)
