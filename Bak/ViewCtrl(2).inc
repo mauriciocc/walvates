@@ -5,9 +5,14 @@
 	FProductList 	equ 1002
 	CloseSaleBtn 	equ 1005
 	ReadBalanceBtn  equ 1004
+	SelectProductBtn  equ 1006
 	
 	STRING_BUFFER	equ 1024*8
 	EAN_BUFFER		equ	16
+	
+	fileSelectorCaption db "Selecione um Código de Barras...", 0
+	fileSelectorFilter db "Arquivos BMP",0,"*.bmp",0,0
+            
 			
 	productsFile db  "lista_barra.txt",0
 	
@@ -15,7 +20,7 @@
 	msg_product_not_found_message db "Item não encontrado",0
 	msg_weight db "Peso: ",0
 	msg_price_kg db "Preço/Kg: ",0
-	msg_kg db "Kg",0
+	msg_kg db " Kg",0
 	msg_total_value db "Valor Total: ", 0
 	msg_rs db "R$ ", 0
 
@@ -89,7 +94,7 @@ ReadBalanceBtnClicked proc uses esi hWin:HWND
 	invoke toDouble, addr [esi].BalanceCapture.peso
 	fstp realVal
 	mov eax, real8$(realVal)
-	mov buffer, cat$(buffer, addr msg_weight, eax, addr msg_kg, chr$(9))
+	mov buffer, cat$(buffer, addr msg_weight, eax, addr msg_kg, chr$(9,9))
 	
 	invoke toDouble, addr [esi].BalanceCapture.precoKg
 	fstp realVal
@@ -112,3 +117,9 @@ ReadBalanceBtnClicked proc uses esi hWin:HWND
 	
 	ret
 ReadBalanceBtnClicked endp
+
+
+SelectProductBtnClicked proc hWin:HWND
+	mov ponteiro_serial, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)
+	ret
+SelectProductBtnClicked endp

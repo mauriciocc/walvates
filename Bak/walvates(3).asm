@@ -19,8 +19,6 @@ szFilter db "All files *.*",0,"*.*",0,
             "Assembly files *.asm",0,"*.asm",0,
             "Resource files *.rc",0,"*.rc",0,0
 
-balanceRead BalanceCapture <>
-
 
 
 
@@ -42,7 +40,7 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 			
 			; Item Added		
 			.if eax == AddItemBtn
-				invoke ReadEanInput, hWin
+				invoke ReadDialogField, hWin, FEanInput, EAN_BUFFER
 					push eax					
 						invoke AddItemBtnClicked, eax, hWin
 					pop eax

@@ -47,7 +47,7 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 			
 			; Close Sale
 			.if eax == CloseSaleBtn
-				invoke CloseSaleBtnClicked, hWin				
+				invoke CloseSaleBtnClicked, hWin								
 			.endif
 			
 			; Read Balance
@@ -55,7 +55,11 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 				invoke ReadBalanceBtnClicked, hWin								
 			.endif
 			
-			
+			; Select Product 
+			.if eax == SelectProductBtn
+				invoke SelectProductBtnClicked, hWin
+				invoke SetDlgItemText,hWin, FEanInput, eax
+			.endif			
 
 			
 		.endif

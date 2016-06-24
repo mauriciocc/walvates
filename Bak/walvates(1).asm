@@ -8,8 +8,6 @@ include classes\ViewCtrl.inc
 .data
 
 
-BUFFER_SIZE EQU 8192
-
 CaptionText        db   "Open File",0
 
 
@@ -57,7 +55,10 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 				invoke ReadBalanceBtnClicked, hWin								
 			.endif
 			
-			
+			; Select Product 
+			.if eax == SelectProductBtn
+				invoke SelectProductBtnClicked, hWin
+			.endif			
 
 			
 		.endif

@@ -1,15 +1,20 @@
 .const
-	FTotalValue  	equ 1008
-	FEanInput 	 	equ 1003
-	AddItemBtn	 	equ 1001
-	FProductList 	equ 1002
-	CloseSaleBtn 	equ 1005
-	ReadBalanceBtn  equ 1004
+	FTotalValue  		equ 1008
+	FEanInput 	 		equ 1003
+	AddItemBtn	 		equ 1001
+	FProductList 		equ 1002
+	CloseSaleBtn 		equ 1005
+	ReadBalanceBtn  	equ 1004
+	SelectProductBtn  	equ 1006
 	
 	STRING_BUFFER	equ 1024*8
 	EAN_BUFFER		equ	16
+	
+	fileSelectorCaption db "Selecione um Código de Barras...", 0
+	fileSelectorFilter  db "Arquivos BMP 256 Cores",0,"*.bmp",0,0
+            
 			
-	productsFile db  "lista_barra.txt",0
+	productsFile db "lista_barra.txt",0
 	
 	msg_attention db "Atenção!",0
 	msg_product_not_found_message db "Item não encontrado",0
@@ -112,3 +117,9 @@ ReadBalanceBtnClicked proc uses esi hWin:HWND
 	
 	ret
 ReadBalanceBtnClicked endp
+
+
+SelectProductBtnClicked proc hWin:HWND
+	mov eax, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)
+	ret
+SelectProductBtnClicked endp
