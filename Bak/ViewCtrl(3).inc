@@ -147,10 +147,7 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	mov edx ,0
 	mov ecx, 2
 	div ecx	
-	invoke ReadBmpImageDataLine, esi, eax	
-	pusha
-		invoke SetDlgItemText, hWin, FEanInput, eax
-	popa
+	invoke ReadBmpImageDataLine, esi, eax
 	invoke ReduceBmpLine, eax
 	pusha
 		invoke SetDlgItemText, hWin, FProductList, eax
