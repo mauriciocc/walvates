@@ -3,26 +3,26 @@
 .data
 
 BmpHeader STRUCT
-	bfType word
-	bfSize dword 
-	bfReser1 word	
-	bfReser2 word
-	bfOffSetBits dword
+	bfType 			word 	?
+	bfSize 			dword 	?
+	bfReser1 		word 	?	
+	bfReser2 		word 	?	
+	bfOffSetBits 	dword 	?
 BmpHeader ends
 PBmpHeader TYPEDEF PTR BmpHeader
 
 BmpBitMap STRUCT
-	biSize dword
-	biWidth dword
-	biHeight dword
-	biPlanes word
-	biBitCount word
-	biCompress dword
-	biSizeImag dword
-	biXPPMeter dword
-	biYPPMeter dword
-	biClrUsed dword
-	biClrImpor dword
+	biSize 		dword	?
+	biWidth 	dword	?
+	biHeight 	dword	?
+	biPlanes 	word	?
+	biBitCount 	word	?
+	biCompress 	dword	?
+	biSizeImag 	dword	?
+	biXPPMeter 	dword	?
+	biYPPMeter 	dword	?
+	biClrUsed 	dword	?
+	biClrImpor 	dword	?
 BmpBitMap ends
 PBmpBitMap TYPEDEF PTR BmpBitMap
 
@@ -33,3 +33,73 @@ Bmp ends
 PBmp TYPEDEF PTR Bmp
 
 .code
+
+CalculateWidthAlignment proc bmpWidth:dword
+	local alignmentFill :dword
+	mov alignmentFill, -1
+	.repeat
+		inc alignmentFill
+		
+		mov eax, bmpWidth
+		add eax, alignmentFill
+						
+		mov ecx, 4
+		
+		mov edx, 0
+		div ecx		
+	.until (edx == 0)
+	
+	mov eax, alignmentFill	
+	ret	
+CalculateWidthAlignment endp
+
+ReadBmpImageDataLine proc uses esi edi bmpPtr:dword, lineNumber:dword
+	local widthAlign :dword
+	local lineContent :dword
+	
+	mov esi, bmpPtr
+	
+	invoke CalculateWidthAlignment, [esi].Bmp.bitMap.biWidth
+	mov widthAlign, eax
+	
+	invoke mem_alloc, [esi].Bmp.bitMap.biWidth
+	mov lineContent, eax
+
+	; Compute line position in image data
+	mov eax, lineNumber
+	mov ecx, [esi].Bmp.bitMap.biWidth
+	add ecx, widthAlign
+	mul ecx
+	add eax, [esi].Bmp.header.bfOffSetBits
+	
+	pusha
+		MSG_BOX ustr$(eax), NULL
+	popa
+	
+	
+	mov edi, lineContent
+	
+	mov edx, 0
+	mov ecx, [esi].Bmp.bitMap.biWidth	
+	.repeat		
+		mov dl, byte ptr [esi+eax]
+		pusha
+			MSG_BOX ustr$(ecx), NULL
+			;MSG_BOX ustr$(edx), NULL			
+		popa
+		
+		.if edx == 255
+			mov [edi], byte ptr "1"
+		.elseif edx == 0
+			mov [edi], byte ptr "0"
+		.else
+			mov [edi], byte ptr "9"
+		.endif
+		inc edi
+		inc eax		
+		dec ecx		
+	.until ecx > 0
+	
+	mov eax, lineContent
+	ret
+ReadBmpImageDataLine endp
