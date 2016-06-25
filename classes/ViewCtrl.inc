@@ -119,7 +119,50 @@ ReadBalanceBtnClicked proc uses esi hWin:HWND
 ReadBalanceBtnClicked endp
 
 
-SelectProductBtnClicked proc hWin:HWND
-	mov eax, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)
+SelectProductBtnClicked proc uses esi hWin:HWND
+	local bmpPtr:dword
+	local filePtr:dword
+	local bytesRead :dword
+	
+	mov eax, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)	
+	OPEN_FILE_MACRO eax, hWin
+		mov filePtr, eax
+		invoke readAllBytes, filePtr
+		mov bmpPtr, eax 
+	invoke CloseHandle, filePtr	
+
+	mov esi, bmpPtr
+	
+	; Computa 'meio' da imagem
+;	mov eax, [esi].Bmp.bitMap.biHeight
+;	mov edx ,0
+;	mov ecx, 2
+;	div ecx
+;	mov ecx, [esi].Bmp.bitMap.biWidth
+;	mul ecx
+	;add eax, [esi].Bmp.header.bfOffSetBits
+	mov eax, [esi].Bmp.header.bfOffSetBits	
+	
+
+	; Agora o registrado eax contem o offset para o inicio da imagem
+	; Procura inicio do código de barras
+	
+	mov edx, 0
+	mov ecx, [esi].Bmp.bitMap.biWidth
+	mov dl, [esi+eax]
+	.while ecx > 0
+		
+		pusha
+		MSG_BOX ustr$(edx), NULL
+		popa
+			
+		inc eax
+		mov dl, [esi+eax]
+		dec ecx		
+	.endw		
+	
+	
+	invoke mem_free, bmpPtr
+	
 	ret
 SelectProductBtnClicked endp

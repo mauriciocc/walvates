@@ -1,19 +1,20 @@
 .const
-	FTotalValue  	equ 1008
-	FEanInput 	 	equ 1003
-	AddItemBtn	 	equ 1001
-	FProductList 	equ 1002
-	CloseSaleBtn 	equ 1005
-	ReadBalanceBtn  equ 1004
+	FTotalValue  		equ 1008
+	FEanInput 	 		equ 1003
+	AddItemBtn	 		equ 1001
+	FProductList 		equ 1002
+	CloseSaleBtn 		equ 1005
+	ReadBalanceBtn  	equ 1004
+	SelectProductBtn  	equ 1006
 	
 	STRING_BUFFER	equ 1024*8
 	EAN_BUFFER		equ	16
 	
 	fileSelectorCaption db "Selecione um Código de Barras...", 0
-	fileSelectorFilter db "Arquivos BMP",0,"*.bmp",0,0
+	fileSelectorFilter  db "Arquivos BMP 256 Cores",0,"*.bmp",0,0
             
 			
-	productsFile db  "lista_barra.txt",0
+	productsFile db "lista_barra.txt",0
 	
 	msg_attention db "Atenção!",0
 	msg_product_not_found_message db "Item não encontrado",0
@@ -118,7 +119,54 @@ ReadBalanceBtnClicked proc uses esi hWin:HWND
 ReadBalanceBtnClicked endp
 
 
-SelectProductBtnClicked proc hWin:HWND
-	mov ponteiro_serial, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)
+SelectProductBtnClicked proc uses esi hWin:HWND
+	local bmpPtr:dword
+	local filePtr:dword
+	local bytesRead :dword
+	
+	mov eax, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)	
+	OPEN_FILE_MACRO eax, hWin
+		mov filePtr, eax
+		invoke readAllBytes, filePtr
+		mov bmpPtr, eax 
+	invoke CloseHandle, filePtr	
+
+	mov esi, bmpPtr
+	
+	; Computa 'meio' da imagem
+;	mov eax, [esi].Bmp.bitMap.biHeight
+;	mov edx ,0
+;	mov ecx, 2
+;	div ecx
+;	mov ecx, [esi].Bmp.bitMap.biWidth
+;	mul ecx
+	;add eax, [esi].Bmp.header.bfOffSetBits
+	mov eax, [esi].Bmp.header.bfOffSetBits
+	pusha
+		mov eax, 0
+			mov eax, [esi].Bmp.bitMap.biSizeImag
+			mov ecx, ustr$(eax)
+		MSG_BOX ecx, NULL
+		popa	
+	
+
+	; Agora o registrado eax contem o offset para o inicio da imagem
+	; Procura inicio do código de barras
+		
+
+	add esi, eax
+	inc esi
+	mov edx, 0
+	mov ecx, [esi].Bmp.bitMap.biWidth
+	mov dl, [esi+eax]
+	.while ecx > 0	
+		inc eax
+		mov dl, [esi+eax]
+		dec ecx		
+	.endw		
+	
+	
+	invoke mem_free, bmpPtr
+	
 	ret
 SelectProductBtnClicked endp
