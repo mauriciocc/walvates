@@ -3,6 +3,7 @@ include classes\File.inc
 include classes\BalanceCapture.inc
 include classes\Product.inc
 include classes\Number.inc
+include classes\Bmp.inc
 include classes\ViewCtrl.inc
 
 .data

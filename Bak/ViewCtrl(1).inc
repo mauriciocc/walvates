@@ -151,28 +151,11 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	pusha
 		invoke SetDlgItemText, hWin, FEanInput, eax
 	popa
-	invoke mem_free, eax
-	
-
-	; Agora o registrado eax contem o offset para o inicio da imagem
-	; Procura inicio do código de barras
-	
-	
-;	mov edx, 0
-;	mov ecx, [esi].Bmp.bitMap.biWidth
-;	mov dl, [esi+eax]
-;	.while ecx > 0
-;		
-;		pusha
-;		MSG_BOX ustr$(edx), NULL
-;		popa
-;			
-;		inc eax
-;		mov dl, [esi+eax]
-;		dec ecx		
-;	.endw		
-	
-	
+	invoke ReduceBmpLine, eax
+	pusha
+		invoke SetDlgItemText, hWin, FProductList, eax
+	popa
+	invoke mem_free, eax	
 	invoke mem_free, bmpPtr
 	
 	ret

@@ -59,7 +59,7 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 			; Select Product 
 			.if eax == SelectProductBtn
 				invoke SelectProductBtnClicked, hWin
-				invoke SetDlgItemText,hWin, FEanInput, eax
+				;invoke SetDlgItemText,hWin, FEanInput, eax
 			.endif			
 
 			
