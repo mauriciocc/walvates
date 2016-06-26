@@ -152,6 +152,11 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	pusha
 		invoke SetDlgItemText, hWin, FProductList, eax
 	popa
+	pusha
+		invoke DecodeBarcode, eax
+		MSG_BOX eax, NULL
+		invoke mem_free, eax
+	popa
 	invoke mem_free, eax	
 	invoke mem_free, bmpPtr
 	

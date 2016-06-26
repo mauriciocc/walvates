@@ -18,15 +18,15 @@ PBalanceCapture TYPEDEF PTR BalanceCapture
 
 .code
 
-readUranoValue proto :dword, :HWND
-readUranoValue proc balanceCapturePtr:dword, hWin:HWND	
+readUranoValue proto :HWND
+readUranoValue proc hWin:HWND	
 	
 	local serial_ptr :dword
 	
 	local bytes_read :dword
 	local result :dword
 	
-	OPEN_FILE_MACRO addr serial_capture_file, hWin					
+	OPEN_FILE_MACRO addr serial_port, hWin					
 	mov serial_ptr, eax
 					
 		invoke PurgeComm, serial_ptr, PURGE_RXCLEAR or PURGE_TXCLEAR

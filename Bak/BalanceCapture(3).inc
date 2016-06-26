@@ -18,12 +18,13 @@ PBalanceCapture TYPEDEF PTR BalanceCapture
 
 .code
 
-readUranoValue proto :dword, :HWND
-readUranoValue proc balanceCapturePtr:dword, hWin:HWND	
+readUranoValue proto :HWND
+readUranoValue proc hWin:HWND	
 	
 	local serial_ptr :dword
-	local result :dword
+	
 	local bytes_read :dword
+	local result :dword
 	
 	OPEN_FILE_MACRO addr serial_capture_file, hWin					
 	mov serial_ptr, eax
@@ -32,9 +33,11 @@ readUranoValue proc balanceCapturePtr:dword, hWin:HWND
 		
 		invoke mem_alloc, type BalanceCapture
 		mov result, eax
+		
 		invoke ReadFile, serial_ptr, result, type BalanceCapture, addr bytes_read, NULL
 						
 	invoke CloseHandle, serial_ptr
+	
 	mov eax, result
 	ret
 readUranoValue endp

@@ -144,16 +144,17 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	
 	; Computa 'meio' da imagem
 	mov eax, [esi].Bmp.bitMap.biHeight
-	mov edx ,0
+	mov edx, 0
 	mov ecx, 2
 	div ecx	
 	invoke ReadBmpImageDataLine, esi, eax
 	invoke ReduceBmpLine, eax
 	pusha
-		invoke SetDlgItemText, hWin, FProductList, eax
-	popa
-	pusha
 		invoke DecodeBarcode, eax
+		pusha
+			invoke SetDlgItemText, hWin, FEanInput, eax
+		popa
+		invoke mem_free, eax
 	popa
 	invoke mem_free, eax	
 	invoke mem_free, bmpPtr
