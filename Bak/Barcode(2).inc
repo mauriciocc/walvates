@@ -5,8 +5,7 @@
 	DIGIT_LENGTH equ 7
 	GROUP_LENGTH equ 6
 	GROUP6_LENGTH equ DIGIT_LENGTH * GROUP_LENGTH
-	GROUP6_SEPARATOR_LENGTH equ 5
-	BAR_CODE_DATA_LENGTH equ (GROUP6_LENGTH * 2) + GROUP6_SEPARATOR_LENGTH
+	GROUP6_SEPARATOR_LENGTH equ 5	
 	BAR_CODE_LENGTH equ 14
 	
 	
@@ -59,23 +58,48 @@ ClearOuterBits proc uses esi edi linePtr:dword
 	ret
 ClearOuterBits endp
 
+IdentifyBarWidth proc uses esi ecx edx linePtr:dword
+	mov esi, linePtr
+	
+	.while byte ptr [esi] == '0'
+		inc esi
+	.endw
+	
+	mov edx, 0
+	
+	.repeat
+		inc edx
+		inc esi		
+	.until byte ptr [esi] == '0'
+	
+	mov eax, edx
+ret	
+IdentifyBarWidth endp
+
 ReduceBmpLine proc uses esi edi linePtr:dword
+	local barWidth :dword
+	
 	mov esi, linePtr
 	mov edi, linePtr
+	
+	invoke IdentifyBarWidth, linePtr
+	mov barWidth, eax
 	
 	invoke mem_size, linePtr
 	mov ecx, eax
 	
-	mov edx, 0
-	.while ecx > 0
-		mov dl, byte ptr [esi]
-		mov [edi], dl
-		add esi, 2
-		inc edi
-		dec ecx
-	.endw
-	mov [edi], byte ptr 0
-	
+	.if barWidth > 1
+		mov edx, 0
+		.while ecx > 0
+			mov dl, byte ptr [esi]
+			mov [edi], dl
+			add esi, 2
+			inc edi
+			dec ecx
+		.endw
+		mov [edi], byte ptr 0	
+	.endif
+			
 	invoke ClearOuterBits, linePtr
 	mov eax, linePtr
 	
@@ -205,6 +229,7 @@ DecodeDigit proc uses ecx esi edi digitPtr:dword, digitIdx:dword, parity:dword
 					mov edi, eax
 				.endif					
 			.endif
+			
 			mov eax, cmp$(tempBuffer, edi)
 			
 			.if  digitIdx > 0 && digitIdx <= 6
@@ -226,9 +251,9 @@ DecodeDigit proc uses ecx esi edi digitPtr:dword, digitIdx:dword, parity:dword
 		
 	.endw	
 	
-	pusha
+	push ecx
 		invoke mem_free, tempBuffer
-	popa
+	pop ecx
 
 	mov eax, ecx
 	add eax, 48 ; To ASCII

@@ -5,11 +5,9 @@ ProcEvento PROTO :HWND,:UINT,:WPARAM,:LPARAM
 
 ; Identificadores de elementos de janela
 .const
-ID_DLG1 equ 1000
 
 .data	
 	hInstance dd ?
-
 .code
 
 MSG_BOX MACRO text, title

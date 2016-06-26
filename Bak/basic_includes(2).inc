@@ -1,9 +1,8 @@
 include \masm32\include\masm32rt.inc
 
-; Protótipo de funcoes
+
 ProcEvento PROTO :HWND,:UINT,:WPARAM,:LPARAM
 
-; Identificadores de elementos de janela
 .const
 
 .data	

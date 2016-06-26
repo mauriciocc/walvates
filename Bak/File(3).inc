@@ -13,8 +13,7 @@ OPEN_FILE_MACRO MACRO path, hWin
 	
 	.if eax == INVALID_HANDLE_VALUE
 		push eax
-		MSG_BOX , NULL 
-		invoke MessageBox, hWin, cat$(addr msg_open_file_error_message,LastError$()), addr msg_open_file_error_title, MB_OK or MB_ICONERROR		
+		invoke MessageBox, hWin, addr msg_open_file_error_message, addr msg_open_file_error_title, MB_OK or MB_ICONERROR		
 		pop eax
 		ret		
 	.endif

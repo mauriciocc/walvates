@@ -11,7 +11,7 @@ ProcEvento PROTO :HWND,:UINT,:WPARAM,:LPARAM
 
 MSG_BOX MACRO text, title
 	pusha
-	invoke MessageBox, NULL, text, title, MB_OK
+	invoke MessageBox, NULL, text, title, MB_OK or MB_ICONINFORMATION
 	popa		 
 ENDM
 

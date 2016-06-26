@@ -15,8 +15,6 @@ MSG_BOX MACRO text, title
 	popa		 
 ENDM
 
-
-
 decode_wparam PROTO :WPARAM
 decode_wparam proc wParam:WPARAM
 	;wParam informa tipo (parte alta) e ID (parte baixa)

@@ -8,22 +8,33 @@
 	ReadBalanceBtn  	equ 1004
 	SelectProductBtn  	equ 1006
 	
+	
 	STRING_BUFFER	equ 1024*8
 	EAN_BUFFER		equ	16
 	
+	EMPTY_STRING db 0
+	
 	fileSelectorCaption db "Selecione um Código de Barras...", 0
 	fileSelectorFilter  db "Arquivos BMP 256 Cores",0,"*.bmp",0,0
-            
+	
+	createFileCaption db "Escolha um nome para o log de venda...", 0
+	createFilePattern db "Arquivo Texto (.txt)",0,"*txt",0,0
+
+	         
 			
 	productsFile db "lista_barra.txt",0
 	
 	msg_attention db "Atenção!",0
 	msg_product_not_found_message db "Item não encontrado",0
+	msg_add_at_least_one_product db "Adicione pelo menos um item para poder fechar a venda!",0
 	msg_weight db "Peso: ",0
 	msg_price_kg db "Preço/Kg: ",0
 	msg_kg db " Kg",0
 	msg_total_value db "Valor Total: ", 0
 	msg_rs db "R$ ", 0
+	
+	LINE_BREAK db 13,10,0
+	TAB_STR db 9,0	
 
 .data
 	
@@ -49,7 +60,7 @@ UpdateProductList proc hWin:HWND, productPtr:dword
 	local buffer :dword
 	invoke ReadDialogField,hWin, FProductList, STRING_BUFFER	
 	mov buffer, eax 
-		mov buffer, cat$(buffer, addr [esi].Product.barcode, chr$(9), addr [esi].Product.product_name, chr$(9), addr [esi].Product.company, chr$(9), addr msg_rs ,addr [esi].Product.price, chr$(13,10))
+		mov buffer, cat$(buffer, addr [esi].Product.barcode, addr TAB_STR, addr [esi].Product.product_name, addr TAB_STR, addr [esi].Product.company, addr TAB_STR, addr msg_rs ,addr [esi].Product.price, addr LINE_BREAK)
 		invoke SetDlgItemText, hWin, FProductList, buffer
 	invoke mem_free, buffer
 	invoke SetDlgItemText, hWin, FEanInput, NULL
@@ -71,14 +82,66 @@ AddItemBtnClicked proc uses esi ean:dword, hWin:HWND
 	ret	
 AddItemBtnClicked endp
 
-CloseSaleBtnClicked proc hWin:HWND
-	local emptyString :dword
-	mov emptyString, chr$(0)
-	invoke SetDlgItemText, hWin, FEanInput, emptyString
-	invoke SetDlgItemText, hWin, FTotalValue, emptyString
-	invoke SetDlgItemText, hWin, FProductList, emptyString
+CloseSaleBtnClicked proc uses ecx hWin:HWND
+	local filePtr :dword
+	local strBuffer :dword
+	local bytesWritten :dword
+	
+	mov bytesWritten, alloc$(2048)
+		
+	fld totalValue
+	ftst
+	fstsw ax
+	fwait
+	sahf
+	
+	.if ZERO?
+		MSG_BOX addr msg_add_at_least_one_product, addr msg_attention
+		ret
+	.endif
+	
+	fstp totalValue
+	
+	mov eax, SaveFileDlg(hWin, hInstance, addr createFileCaption, addr createFilePattern)	
+	mov cl, byte ptr [eax]	
+	
+	; User cancelou
+	.if cl == 0
+		ret
+	.endif
+	
+	mov bytesWritten, cat$(bytesWritten, eax)
+		
+	mov ecx, find$(1, bytesWritten, chr$('.txt'))
+	.if ecx == 0
+		mov bytesWritten, cat$(bytesWritten, chr$(".txt"))			   
+	.endif
+		
+			
+	OPEN_OR_CREATE_FILE_MACRO bytesWritten, hWin
+	mov filePtr, eax
+	
+	free$ bytesWritten
+	
+	invoke mem_alloc, STRING_BUFFER
+	mov strBuffer, eax
+	
+	invoke GetDlgItemText, hWin, FProductList, strBuffer, STRING_BUFFER
+	mov strBuffer, cat$(strBuffer, addr LINE_BREAK, addr msg_total_value, addr msg_rs, real8$(totalValue))
+	
+	mov ecx, len(strBuffer)	
+	invoke WriteFile, filePtr, strBuffer, ecx, addr bytesWritten, NULL
+	
+	 
+	invoke SetDlgItemText, hWin, FEanInput, addr EMPTY_STRING
+	invoke SetDlgItemText, hWin, FTotalValue, addr EMPTY_STRING
+	invoke SetDlgItemText, hWin, FProductList, addr EMPTY_STRING
+	
 	fldz
-	fstp totalValue	
+	fstp totalValue
+		
+	invoke mem_free, strBuffer
+	invoke CloseHandle, filePtr
 	ret
 CloseSaleBtnClicked endp
 
@@ -159,7 +222,7 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	invoke ReadBmpImageDataLine, esi, eax
 	invoke ReduceBmpLine, eax
 	push eax
-		invoke DecodeBarcode, eax
+		invoke DecodeBarcode, eax		
 		push eax
 			invoke AddItemBtnClicked, eax, hWin
 		pop eax					
