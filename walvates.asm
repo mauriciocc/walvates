@@ -9,26 +9,11 @@ include classes\ViewCtrl.inc
 
 .data
 
-
-CaptionText        db   "Open File",0
-
-
-
-szFilter db "All files *.*",0,"*.*",0,
-            "Text files *.txt",0,"*.txt",0,
-            "Assembly files *.asm",0,"*.asm",0,
-            "Resource files *.rc",0,"*.rc",0,0
-
-
-
-
-
 .code
 
 ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 	mov eax,uMsg	
-	; WM_INITDIALOG -> pode ser utilizado para inicializar recursos, como abrir portas
-	; WM_CLOSE -> indica fechamento do programa, pode liberar recursos também
+
 	.if eax==WM_INITDIALOG
 		invoke InitializeProductDatabase, addr productsFile, hWin
 		mov productsDatabase, eax	
@@ -59,8 +44,7 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 			
 			; Select Product 
 			.if eax == SelectProductBtn
-				invoke SelectProductBtnClicked, hWin
-				;invoke SetDlgItemText,hWin, FEanInput, eax
+				invoke SelectProductBtnClicked, hWin				
 			.endif			
 
 			

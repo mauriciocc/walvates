@@ -86,9 +86,7 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 	local filePtr :dword
 	local strBuffer :dword
 	local bytesWritten :dword
-	
-	mov bytesWritten, alloc$(2048)
-		
+				
 	fld totalValue
 	ftst
 	fstsw ax
@@ -110,15 +108,19 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 		ret
 	.endif
 	
+	push eax
+	mov bytesWritten, alloc$(2048)
+	pop eax
+	
 	mov bytesWritten, cat$(bytesWritten, eax)
 		
 	mov ecx, find$(1, bytesWritten, chr$('.txt'))
 	.if ecx == 0
-		mov bytesWritten, cat$(bytesWritten, eax, chr$(".txt"))			   
+		mov bytesWritten, cat$(bytesWritten, chr$(".txt"))			   
 	.endif
 		
 			
-	OPEN_OR_CREATE_FILE_MACRO eax, hWin
+	OPEN_OR_CREATE_FILE_MACRO bytesWritten, hWin
 	mov filePtr, eax
 	
 	free$ bytesWritten

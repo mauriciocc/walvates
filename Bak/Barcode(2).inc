@@ -82,6 +82,8 @@ ReduceBmpLine proc uses esi edi linePtr:dword
 	mov esi, linePtr
 	mov edi, linePtr
 	
+	MSG_BOX linePtr, NULL
+	
 	invoke IdentifyBarWidth, linePtr
 	mov barWidth, eax
 	

@@ -7,9 +7,8 @@ msg_open_file_error_message db "Erro ao abrir arquivo/comunicação!",0
 
 .code
 
-OPEN_FILE_MACRO MACRO path, hWin
-	
-	invoke CreateFile, path, GENERIC_READ or GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL
+OPEN_FILE MACRO path, hWin, opts
+	invoke CreateFile, path, GENERIC_READ or GENERIC_WRITE, 0, NULL, opts, FILE_ATTRIBUTE_NORMAL, NULL
 	
 	.if eax == INVALID_HANDLE_VALUE
 		push eax
@@ -17,20 +16,14 @@ OPEN_FILE_MACRO MACRO path, hWin
 		pop eax
 		ret		
 	.endif
-		 
+endm
+
+OPEN_FILE_MACRO MACRO path, hWin
+	OPEN_FILE path, hWin, OPEN_EXISTING
 ENDM
 
 OPEN_OR_CREATE_FILE_MACRO MACRO path, hWin
-	
-	invoke CreateFile, path, GENERIC_READ or GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL
-	
-	.if eax == INVALID_HANDLE_VALUE
-		push eax
-			invoke MessageBox, hWin, addr msg_open_file_error_message, addr msg_open_file_error_title, MB_OK or MB_ICONERROR		
-		pop eax
-		ret		
-	.endif
-		 
+	OPEN_FILE path, hWin, CREATE_ALWAYS		 
 ENDM
 
 readAllBytes proto :UINT

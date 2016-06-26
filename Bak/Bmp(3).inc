@@ -65,18 +65,12 @@ ReadBmpImageDataLine proc uses esi edi bmpPtr:dword, lineNumber:dword
 	invoke mem_alloc, [esi].Bmp.bitMap.biWidth
 	mov lineContent, eax
 
-	; Compute line position in image data
+	; Compute line position in image data (considering bmp 4 byte align)
 	mov eax, lineNumber
 	mov ecx, [esi].Bmp.bitMap.biWidth
 	add ecx, widthAlign
 	mul ecx
 	add eax, [esi].Bmp.header.bfOffSetBits
-	
-	pusha
-		MSG_BOX ustr$(eax), NULL
-	popa
-	
-	
 	mov edi, lineContent
 	
 	mov edx, 0
@@ -86,9 +80,9 @@ ReadBmpImageDataLine proc uses esi edi bmpPtr:dword, lineNumber:dword
 		mov dl, byte ptr [esi+eax]
 		
 		.if (edx == 255)
-			mov [edi], byte ptr "1"
-		.elseif (edx == 0)
 			mov [edi], byte ptr "0"
+		.elseif (edx == 0)
+			mov [edi], byte ptr "1"
 		.else
 			mov [edi], byte ptr "9"
 		.endif

@@ -82,9 +82,10 @@ ReduceBmpLine proc uses esi edi linePtr:dword
 	mov esi, linePtr
 	mov edi, linePtr
 	
+	MSG_BOX linePtr, NULL
+	
 	invoke IdentifyBarWidth, linePtr
 	mov barWidth, eax
-	MSG_BOX ustr$(eax), NULL
 	
 	invoke mem_size, linePtr
 	mov ecx, eax
@@ -175,7 +176,7 @@ InverseCode proc uses esi edi stringPtr:dword
 		.while ecx > 0
 			.if byte ptr [esi] == '0'
 				mov [edi], byte ptr '1'
-			.else
+			.elseif byte ptr [esi] == '255'
 				mov [edi], byte ptr '0'
 			.endif
 			inc esi

@@ -27,8 +27,7 @@ szFilter db "All files *.*",0,"*.*",0,
 
 ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 	mov eax,uMsg	
-	; WM_INITDIALOG -> pode ser utilizado para inicializar recursos, como abrir portas
-	; WM_CLOSE -> indica fechamento do programa, pode liberar recursos também
+
 	.if eax==WM_INITDIALOG
 		invoke InitializeProductDatabase, addr productsFile, hWin
 		mov productsDatabase, eax	
@@ -59,8 +58,7 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 			
 			; Select Product 
 			.if eax == SelectProductBtn
-				invoke SelectProductBtnClicked, hWin
-				;invoke SetDlgItemText,hWin, FEanInput, eax
+				invoke SelectProductBtnClicked, hWin				
 			.endif			
 
 			
@@ -87,7 +85,7 @@ start:
 	invoke GetModuleHandle,NULL	
 	mov hInstance,eax
 	
-	invoke DialogBoxParam, hInstance, ID_DLG1, NULL, addr ProcEvento, NULL
+	invoke DialogBoxParam, hInstance, MainDialog, NULL, addr ProcEvento, NULL
 	invoke ExitProcess,0
 	
 end start
