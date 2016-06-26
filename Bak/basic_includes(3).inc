@@ -6,15 +6,9 @@ ProcEvento PROTO :HWND,:UINT,:WPARAM,:LPARAM
 ; Identificadores de elementos de janela
 .const
 ID_DLG1 equ 1000
-ID_BTN_ENVIA equ 1001
-ID_TEXT equ 1002
-
-ID_BTN_RECEBE equ 1004
-ID_TEXT_RECEBE equ 1003
 
 .data	
-	Inst_principal dd ?
-	vetor db 0,0,0,0
+	hInstance dd ?
 
 .code
 
@@ -59,3 +53,12 @@ mem_size proc dataPtr:UINT
 	invoke HeapSize, eax, 0, dataPtr
 	ret
 mem_size endp
+
+mem_array_length proto :dword, :dword
+
+mem_array_length proc dataPtr:dword, itemSize:dword	
+	invoke mem_size, dataPtr	 
+	mov edx, 0
+	div itemSize	
+	ret
+mem_array_length endp

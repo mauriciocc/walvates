@@ -205,6 +205,7 @@ DecodeDigit proc uses ecx esi edi digitPtr:dword, digitIdx:dword, parity:dword
 					mov edi, eax
 				.endif					
 			.endif
+			
 			mov eax, cmp$(tempBuffer, edi)
 			
 			.if  digitIdx > 0 && digitIdx <= 6
@@ -276,13 +277,13 @@ DecodeBarcode proc uses esi edi ecx edx codePtr:dword
 		inc ecx
 	.endw
 	mov [edi], byte ptr 0
-	
-	MSG_BOX firstDigitPtr, NULL
-	
+		
 	mov edi, resultPtr
 	
 	invoke DecodeDigit, firstDigitPtr, 0, 0
 	mov [edi], byte ptr al	
+	
+	invoke mem_free, firstDigitPtr
 	
 	mov eax, resultPtr	
 	ret

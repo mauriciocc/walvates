@@ -136,8 +136,30 @@ MirrorCode proc uses esi edi stringPtr:dword
 	ret
 MirrorCode endp
 
-InverseCode proc stringPtr:dword
-
+InverseCode proc uses esi edi stringPtr:dword
+	local result :dword
+		
+	pusha		
+		mov ecx, len(stringPtr)
+		push ecx
+			invoke mem_alloc, ecx
+			mov result, eax
+		pop ecx
+		mov esi, stringPtr
+		mov edi, result
+		.while ecx > 0
+			.if byte ptr [esi] == '0'
+				mov [edi], byte ptr '1'
+			.else
+				mov [edi], byte ptr '0'
+			.endif
+			inc esi
+			inc edi
+			dec ecx
+		.endw	
+	popa
+	
+	mov eax, result
 	ret
 InverseCode endp
 
@@ -254,9 +276,7 @@ DecodeBarcode proc uses esi edi ecx edx codePtr:dword
 		inc ecx
 	.endw
 	mov [edi], byte ptr 0
-	
-	MSG_BOX firstDigitPtr, NULL
-	
+		
 	mov edi, resultPtr
 	
 	invoke DecodeDigit, firstDigitPtr, 0, 0

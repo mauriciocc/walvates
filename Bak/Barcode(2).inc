@@ -148,10 +148,10 @@ InverseCode proc uses esi edi stringPtr:dword
 		mov esi, stringPtr
 		mov edi, result
 		.while ecx > 0
-			.if [esi] == '0'
-				mov [edi], '1'
+			.if byte ptr [esi] == '0'
+				mov [edi], byte ptr '1'
 			.else
-				mov [edi], '0'
+				mov [edi], byte ptr '0'
 			.endif
 			inc esi
 			inc edi
@@ -276,13 +276,13 @@ DecodeBarcode proc uses esi edi ecx edx codePtr:dword
 		inc ecx
 	.endw
 	mov [edi], byte ptr 0
-	
-	MSG_BOX firstDigitPtr, NULL
-	
+		
 	mov edi, resultPtr
 	
 	invoke DecodeDigit, firstDigitPtr, 0, 0
 	mov [edi], byte ptr al	
+	
+	invoke mem_free, firstDigitPtr
 	
 	mov eax, resultPtr	
 	ret

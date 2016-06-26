@@ -6,6 +6,7 @@
 #define ProductList 1002
 #define EanInput 1003
 #define Sell 1005
+#define SelectProduct 1006
 
 WalvatesMainDialog DIALOGEX 10,10,330,303
 CAPTION "Walvates"
@@ -19,5 +20,6 @@ BEGIN
   CONTROL "",ProductList,"Edit",0x50210004,15,54,297,171,0x00000200
   CONTROL "",EanInput,"Edit",0x50012000,10,10,75,15,0x00000200
   CONTROL "Fechar Venda",Sell,"Button",0x50010000,258,261,54,15
+  CONTROL "Selecionar Produto",SelectProduct,"Button",0x50010000,147,9,69,15
 END
 

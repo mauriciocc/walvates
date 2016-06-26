@@ -1,4 +1,5 @@
 .const
+	MainDialog 			equ 1000
 	FTotalValue  		equ 1008
 	FEanInput 	 		equ 1003
 	AddItemBtn	 		equ 1001
@@ -85,15 +86,23 @@ ReadBalanceBtnClicked proc uses esi hWin:HWND
 	local buffer :dword
 	local realVal :real8
 	
-	invoke ReadDialogField,hWin, FProductList, STRING_BUFFER	
-	mov buffer, eax 
+
 		
 	invoke readUranoValue, hWin	
+	.if eax == INVALID_HANDLE_VALUE
+		ret
+	.endif
 	mov esi, eax
 	
 	invoke toDouble, addr [esi].BalanceCapture.peso
 	fstp realVal
 	mov eax, real8$(realVal)
+	
+	pusha 	
+		invoke ReadDialogField,hWin, FProductList, STRING_BUFFER	
+		mov buffer, eax
+	popa
+	 
 	mov buffer, cat$(buffer, addr msg_weight, eax, addr msg_kg, chr$(9,9))
 	
 	invoke toDouble, addr [esi].BalanceCapture.precoKg
@@ -126,7 +135,7 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	local widthAlign :dword
 	
 	
-	mov eax, OpenFileDlg(hWin, 0, addr fileSelectorCaption, addr fileSelectorFilter)
+	mov eax, OpenFileDlg(hWin, hInstance, addr fileSelectorCaption, addr fileSelectorFilter)	
 	mov cl, byte ptr [eax]
 	
 	; User cancelou
@@ -135,7 +144,7 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	.endif
 		
 	OPEN_FILE_MACRO eax, hWin
-		mov filePtr, eax
+	mov filePtr, eax
 		invoke readAllBytes, filePtr
 		mov bmpPtr, eax 
 	invoke CloseHandle, filePtr	
@@ -144,19 +153,18 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	
 	; Computa 'meio' da imagem
 	mov eax, [esi].Bmp.bitMap.biHeight
-	mov edx ,0
+	mov edx, 0
 	mov ecx, 2
 	div ecx	
 	invoke ReadBmpImageDataLine, esi, eax
 	invoke ReduceBmpLine, eax
-	pusha
-		invoke SetDlgItemText, hWin, FProductList, eax
-	popa
-	pusha
+	push eax
 		invoke DecodeBarcode, eax
-		MSG_BOX eax, NULL
+		push eax
+			invoke AddItemBtnClicked, eax, hWin
+		pop eax					
 		invoke mem_free, eax
-	popa
+	pop eax
 	invoke mem_free, eax	
 	invoke mem_free, bmpPtr
 	

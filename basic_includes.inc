@@ -1,15 +1,12 @@
 include \masm32\include\masm32rt.inc
 
-; Protótipo de funcoes
+
 ProcEvento PROTO :HWND,:UINT,:WPARAM,:LPARAM
 
-; Identificadores de elementos de janela
 .const
-ID_DLG1 equ 1000
 
 .data	
-	Inst_principal dd ?
-
+	hInstance dd ?
 .code
 
 MSG_BOX MACRO text, title
@@ -17,8 +14,6 @@ MSG_BOX MACRO text, title
 	invoke MessageBox, NULL, text, title, MB_OK
 	popa		 
 ENDM
-
-
 
 decode_wparam PROTO :WPARAM
 decode_wparam proc wParam:WPARAM

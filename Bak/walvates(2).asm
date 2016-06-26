@@ -4,6 +4,7 @@ include classes\BalanceCapture.inc
 include classes\Product.inc
 include classes\Number.inc
 include classes\Bmp.inc
+include classes\Barcode.inc
 include classes\ViewCtrl.inc
 
 .data
@@ -52,14 +53,14 @@ ProcEvento proc uses edi esi hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 			.endif
 			
 			; Read Balance
-			.if eax == ReadBalanceBtn
+			.if eax == ReadBalanceBtn				
 				invoke ReadBalanceBtnClicked, hWin								
 			.endif
 			
 			; Select Product 
 			.if eax == SelectProductBtn
 				invoke SelectProductBtnClicked, hWin
-				invoke SetDlgItemText,hWin, FEanInput, eax
+				;invoke SetDlgItemText,hWin, FEanInput, eax
 			.endif			
 
 			
@@ -84,9 +85,9 @@ ProcEvento endp
 start:
 	
 	invoke GetModuleHandle,NULL	
-	mov Inst_principal,eax
+	mov hInstance,eax
 	
-	invoke DialogBoxParam, Inst_principal, ID_DLG1, NULL, addr ProcEvento, NULL
+	invoke DialogBoxParam, hInstance, ID_DLG1, NULL, addr ProcEvento, NULL
 	invoke ExitProcess,0
 	;fim do código
 end start

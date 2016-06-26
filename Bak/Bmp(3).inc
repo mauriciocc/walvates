@@ -84,10 +84,6 @@ ReadBmpImageDataLine proc uses esi edi bmpPtr:dword, lineNumber:dword
 	.while (ecx > 0)		
 			
 		mov dl, byte ptr [esi+eax]
-		pusha
-			MSG_BOX ustr$(ecx), NULL
-			;MSG_BOX ustr$(edx), NULL			
-		popa
 		
 		.if (edx == 255)
 			mov [edi], byte ptr "1"

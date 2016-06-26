@@ -1,7 +1,7 @@
 .const
 
 msg_open_file_error_title   db "Atenção!",0
-msg_open_file_error_message db "Não foi possível estabelecer comunicação!",0
+msg_open_file_error_message db "Erro ao abrir arquivo/comunicação!",0
 
 .data
 
@@ -12,7 +12,9 @@ OPEN_FILE_MACRO MACRO path, hWin
 	invoke CreateFile, path, GENERIC_READ or GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL
 	
 	.if eax == INVALID_HANDLE_VALUE
-		invoke MessageBox, hWin, addr msg_open_file_error_message, addr msg_open_file_error_title, MB_OK or MB_ICONERROR
+		push eax
+		invoke MessageBox, hWin, addr msg_open_file_error_message, addr msg_open_file_error_title, MB_OK or MB_ICONERROR		
+		pop eax
 		ret		
 	.endif
 		 
@@ -28,7 +30,7 @@ readAllBytes proc filePtr:UINT
 	invoke GetFileSize, filePtr, NULL
 	mov fileSize, eax
 	
-	invoke malloc, fileSize	
+	invoke mem_alloc, fileSize	
 	mov allocatedHeap, eax
 	
 	invoke ReadFile, filePtr, allocatedHeap, fileSize, addr bytes_read, NULL

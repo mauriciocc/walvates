@@ -80,9 +80,9 @@ ReadBmpImageDataLine proc uses esi edi bmpPtr:dword, lineNumber:dword
 		mov dl, byte ptr [esi+eax]
 		
 		.if (edx == 255)
-			mov [edi], byte ptr "1"
-		.elseif (edx == 0)
 			mov [edi], byte ptr "0"
+		.elseif (edx == 0)
+			mov [edi], byte ptr "1"
 		.else
 			mov [edi], byte ptr "9"
 		.endif
