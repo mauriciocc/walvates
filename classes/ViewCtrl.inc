@@ -32,6 +32,7 @@
 	msg_kg db " Kg",0
 	msg_total_value db "Valor Total: ", 0
 	msg_rs db "R$ ", 0
+	msg_sale_success db "Venda finalizada com sucesso!",0
 	
 	LINE_BREAK db 13,10,0
 	TAB_STR db 9,0	
@@ -149,6 +150,8 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 		
 	invoke mem_free, strBuffer
 	invoke CloseHandle, filePtr
+	
+	MSG_BOX addr msg_sale_success, addr msg_attention
 	ret
 CloseSaleBtnClicked endp
 

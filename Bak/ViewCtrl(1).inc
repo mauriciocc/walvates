@@ -32,6 +32,7 @@
 	msg_kg db " Kg",0
 	msg_total_value db "Valor Total: ", 0
 	msg_rs db "R$ ", 0
+	msg_sale_success db "Venda finalizada com sucesso!",0
 	
 	LINE_BREAK db 13,10,0
 	TAB_STR db 9,0	
@@ -109,7 +110,7 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 	.endif
 	
 	push eax
-	mov bytesWritten, alloc$(2048)
+		mov bytesWritten, alloc$(2048)
 	pop eax
 	
 	mov bytesWritten, cat$(bytesWritten, eax)
@@ -122,8 +123,13 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 			
 	OPEN_OR_CREATE_FILE_MACRO bytesWritten, hWin
 	mov filePtr, eax
-	
+		
 	free$ bytesWritten
+	
+	.if filePtr == INVALID_HANDLE_VALUE
+		ret
+	.endif
+	
 	
 	invoke mem_alloc, STRING_BUFFER
 	mov strBuffer, eax
@@ -144,6 +150,8 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 		
 	invoke mem_free, strBuffer
 	invoke CloseHandle, filePtr
+	
+	MSG_BOX msg_sale_success, msg_attention
 	ret
 CloseSaleBtnClicked endp
 
