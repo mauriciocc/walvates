@@ -7,6 +7,8 @@
 #define EanInput 1003
 #define Sell 1005
 #define SelectProduct 1006
+#define FQuantity 1009
+#define IDC_STC1 1010
 
 WalvatesMainDialog DIALOGEX 10,10,435,258
 CAPTION "Walvates"
@@ -21,5 +23,7 @@ BEGIN
   CONTROL "",EanInput,"Edit",NOT 0x10000000|0x40012000,10,10,75,15,0x00000200
   CONTROL "Fechar Venda",Sell,"Button",0x50010000,366,237,54,15
   CONTROL "Selecionar Produto",SelectProduct,"Button",0x50010000,291,9,69,15
+  CONTROL "1",FQuantity,"Edit",0x50012000,267,9,18,15,0x00000200
+  CONTROL "Quantidade",IDC_STC1,"Static",0x50000000,225,12,39,9
 END
 

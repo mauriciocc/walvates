@@ -9,15 +9,15 @@ PProduct TYPEDEF PTR Product
 .code
 
 parseProductList proto :UINT
-parseProductList proc listString:UINT	
+parseProductList proc uses esi edi listString:UINT	
 	local strSize :UINT
 	local result :UINT
 	
 	invoke mem_size, listString	
 	mov strSize, eax
 	
-	; 38 Aqui representa o numero de itens na lista, pode se tornar dinamico fazendo uso
-	invoke mem_alloc, (type Product * 38)
+	; 38 Aqui representa o numero de itens na lista, pode se tornar dinamico fazendo uso do realloc
+	invoke mem_alloc, (type Product * 64)
 	mov result, eax
 	
 	
@@ -114,7 +114,7 @@ findProductByBarcode proc codeToSearch:dword, productList:dword
 				
 		push esi
 		push ecx			
-			mov ecx, 13
+			mov ecx, 14
 			cld
 			repe cmpsb
 			mov eax, ecx

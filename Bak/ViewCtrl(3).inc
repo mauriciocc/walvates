@@ -7,6 +7,7 @@
 	CloseSaleBtn 		equ 1005
 	ReadBalanceBtn  	equ 1004
 	SelectProductBtn  	equ 1006
+	FQuantity			equ 1009
 	
 	
 	STRING_BUFFER	equ 1024*8
@@ -23,6 +24,7 @@
 	         
 			
 	productsFile db "lista_barra.txt",0
+	notaFiscalFile db "nota_fiscal.txt",0
 	
 	msg_attention db "Atenção!",0
 	msg_product_not_found_message db "Item não encontrado",0
@@ -32,6 +34,7 @@
 	msg_kg db " Kg",0
 	msg_total_value db "Valor Total: ", 0
 	msg_rs db "R$ ", 0
+	msg_sale_success db "Venda finalizada com sucesso!",0
 	
 	LINE_BREAK db 13,10,0
 	TAB_STR db 9,0	
@@ -93,48 +96,53 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 	fwait
 	sahf
 	
-	.if ZERO?
-		MSG_BOX addr msg_add_at_least_one_product, addr msg_attention
-		ret
-	.endif
-	
-	fstp totalValue
-	
-	mov eax, SaveFileDlg(hWin, hInstance, addr createFileCaption, addr createFilePattern)	
-	mov cl, byte ptr [eax]	
-	
-	; User cancelou
-	.if cl == 0
-		ret
-	.endif
-	
-	push eax
-		mov bytesWritten, alloc$(2048)
-	pop eax
-	
-	mov bytesWritten, cat$(bytesWritten, eax)
-		
-	mov ecx, find$(1, bytesWritten, chr$('.txt'))
-	.if ecx == 0
-		mov bytesWritten, cat$(bytesWritten, chr$(".txt"))			   
-	.endif
+;	.if ZERO?
+;		MSG_BOX addr msg_add_at_least_one_product, addr msg_attention
+;		ret
+;	.endif
+;	
+;	fstp totalValue
+;	
+;	mov eax, SaveFileDlg(hWin, hInstance, addr createFileCaption, addr createFilePattern)	
+;	mov cl, byte ptr [eax]	
+;	
+;	; User cancelou
+;	.if cl == 0
+;		ret
+;	.endif
+;	
+;	push eax
+;		mov bytesWritten, alloc$(2048)
+;	pop eax
+;	
+;	mov bytesWritten, cat$(bytesWritten, eax)
+;		
+;	mov ecx, find$(1, bytesWritten, chr$('.txt'))
+;	.if ecx == 0
+;		mov bytesWritten, cat$(bytesWritten, chr$(".txt"))			   
+;	.endif
 		
 			
-	OPEN_OR_CREATE_FILE_MACRO bytesWritten, hWin
+	OPEN_OR_CREATE_FILE_MACRO addr notaFiscalFile, hWin
 	mov filePtr, eax
 		
-	free$ bytesWritten
+;	free$ bytesWritten
 	
 	.if filePtr == INVALID_HANDLE_VALUE
 		ret
 	.endif
 	
+	;NF Header
+	mov strBuffer, chr$("WALVATES IND E COM DE SOFTWARE S/A", 13, 10, "Rua Sem Nome, 123, Bairro Teste", 13, 10, "CNPJ: 74.410.743/0001-76", 13, 10, "----------------------------------", 13,10, 13,10, "EAN", 9,9,9,9, "PRODUTO", 9,9,9,9,9,9, "EMPRESA", 9,9, "VALOR", 13, 10)
+	mov ecx, len(strBuffer)
+	invoke WriteFile, filePtr, strBuffer, ecx, addr bytesWritten, NULL	
 	
 	invoke mem_alloc, STRING_BUFFER
 	mov strBuffer, eax
 	
 	invoke GetDlgItemText, hWin, FProductList, strBuffer, STRING_BUFFER
 	mov strBuffer, cat$(strBuffer, addr LINE_BREAK, addr msg_total_value, addr msg_rs, real8$(totalValue))
+	
 	
 	mov ecx, len(strBuffer)	
 	invoke WriteFile, filePtr, strBuffer, ecx, addr bytesWritten, NULL
@@ -149,6 +157,8 @@ CloseSaleBtnClicked proc uses ecx hWin:HWND
 		
 	invoke mem_free, strBuffer
 	invoke CloseHandle, filePtr
+	
+	MSG_BOX addr msg_sale_success, addr msg_attention
 	ret
 CloseSaleBtnClicked endp
 
@@ -202,8 +212,11 @@ SelectProductBtnClicked proc uses esi hWin:HWND
 	local bmpPtr :dword	
 	local bytesRead :dword
 	local widthAlign :dword
+	local quantity :dword
 	
-	
+	invoke GetDlgItemInt, hWin, FQuantity, NULL, FALSE
+	mov quantity, eax
+	MSG_BOX ustr$(quantity), NULL
 	mov eax, OpenFileDlg(hWin, hInstance, addr fileSelectorCaption, addr fileSelectorFilter)	
 	mov cl, byte ptr [eax]
 	

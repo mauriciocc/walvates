@@ -16,8 +16,9 @@ parseProductList proc uses esi edi listString:UINT
 	invoke mem_size, listString	
 	mov strSize, eax
 	
-	; 38 Aqui representa o numero de itens na lista, pode se tornar dinamico fazendo uso
-	invoke mem_alloc, (type Product * 38)
+	; 128 Aqui representa o numero de itens na lista, pode se tornar dinamico fazendo uso do realloc
+	; Colocado numero alto para permitir expansão da lista
+	invoke mem_alloc, (type Product * 128)
 	mov result, eax
 	
 	
@@ -114,7 +115,7 @@ findProductByBarcode proc codeToSearch:dword, productList:dword
 				
 		push esi
 		push ecx			
-			mov ecx, 13
+			mov ecx, 14
 			cld
 			repe cmpsb
 			mov eax, ecx

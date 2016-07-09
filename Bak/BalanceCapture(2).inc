@@ -1,7 +1,7 @@
 .const
 
 serial_capture_file db "serial_captured_input.txt",0
-serial_port db "COM1",0
+serial_port db "COM2",0
 
 .data
 
@@ -32,7 +32,7 @@ readUranoValue proc hWin:HWND
 	.endif					
 	mov serial_ptr, eax
 					
-		invoke PurgeComm, serial_ptr, PURGE_RXCLEAR or PURGE_TXCLEAR
+		;invoke PurgeComm, serial_ptr, PURGE_RXCLEAR or PURGE_TXCLEAR
 		
 		invoke mem_alloc, type BalanceCapture
 		mov result, eax
